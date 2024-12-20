@@ -1,5 +1,3 @@
-let createField = document.getElementById('create-field');
-
 const itemTemplate = item => {
   return `<li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
   <span class="item-text">${item.text}</span>
@@ -18,17 +16,19 @@ const ourHTML = items
   .join('');
 document.getElementById('item-list').insertAdjacentHTML('beforeend', ourHTML);
 
-// Create
-document.getElementById('create-form').addEventListener('submit', function (e) {
+// Create Feature
+let createForm = document.getElementById('create-form');
+let createField = document.getElementById('create-field');
+let itemList = document.getElementById('item-list');
+
+createForm.addEventListener('submit', function (e) {
   e.preventDefault();
   axios
     .post('/create-item', {
       text: createField.value,
     })
     .then(function (response) {
-      document
-        .getElementById('item-list')
-        .insertAdjacentHTML('beforeend', itemTemplate(response.data));
+      itemList.insertAdjacentHTML('beforeend', itemTemplate(response.data));
       createField.value = '';
       createField.focus();
     })
@@ -43,8 +43,9 @@ document.addEventListener('click', e => {
   if (e.target.classList.contains('edit-me')) {
     let itemTextEl =
       e.target.parentElement.parentElement.querySelector('.item-text');
-    let itemTextVal = itemTextEl.textContent;
+    let itemTextVal = itemTextEl.textContent; // bude predvyplneno pole v Promptu
     let userInput = prompt('Enter your desired new text', itemTextVal);
+    // IF zamezi to poslani null pri kliknuti na Cancel
     if (userInput) {
       axios
         .post('/update-item', {
@@ -52,7 +53,7 @@ document.addEventListener('click', e => {
           id: e.target.getAttribute('data-id'),
         })
         .then(function () {
-          itemTextEl.innerHTML = userInput;
+          itemTextEl.innerHTML = userInput; // po odeslani do db se nahradi text
         })
         .catch(function () {
           console.log('Please try again later.');
